@@ -14,6 +14,8 @@ from openai import OpenAI
 client = OpenAI(
     api_key="eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjIzZjIwMDE5MTVAZHMuc3R1ZHkuaWl0bS5hYy5pbiJ9.DqxIp0WMnSQCmn5L25fVVBpIFAUqocHHgwU8pwIZMh0",
     base_url="https://aipipe.org/openai/v1"
+)
+
 def read_questions(filepath):
     with open(filepath, "r") as f:
         return f.read()
@@ -45,20 +47,19 @@ def extract_data_from_files(file_paths):
 
 def generate_answer(questions, context):
     prompt = f"""
-    You are a data analyst. Answer the following questions based on the provided data.
+You are a data analyst. Answer the following questions based on the provided data.
 
-    Questions:
-    {questions}
+Questions:
+{questions}
 
-    Data:
-    {context}
-    """
+Data:
+{context}
+"""
     response = client.chat.completions.create(
-    model="gpt-4o-mini",
-    messages=[{"role": "user", "content": prompt}],
-    temperature=0
-)
-return response.choices[0].message.content
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0
+    )
     return response.choices[0].message.content
 
 def save_output_file(answer_text, fmt, work_dir):
