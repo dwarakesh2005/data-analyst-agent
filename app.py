@@ -14,6 +14,14 @@ from utils import (
 
 app = FastAPI()
 
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
 @app.get("/")
 async def home():
     return {"message": "Data Analyst Agent is running. Use POST / to send files."}
