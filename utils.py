@@ -13,9 +13,14 @@ import base64
 import duckdb
 import io
 
-# AI Pipe client (replace with your AI Pipe token)
+# Read AI Pipe token from environment variable
+AIPIPE_TOKEN = os.getenv("AIPIPE_TOKEN")
+if not AIPIPE_TOKEN:
+    raise ValueError("Environment variable AIPIPE_TOKEN is not set")
+
+# AI Pipe client
 client = OpenAI(
-    api_key="eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjIzZjIwMDE5MTVAZHMuc3R1ZHkuaWl0bS5pbiJ9.DqxIp0WMnSQCmn5L25fVVBpIFAUqocHHgwU8pwIZMh0",
+    api_key=AIPIPE_TOKEN,
     base_url="https://aipipe.org/openai/v1"
 )
 
@@ -74,69 +79,4 @@ def run_duckdb_query(df: pd.DataFrame, query: str) -> pd.DataFrame:
     """
     con = duckdb.connect()
     con.register('data', df)
-    result_df = con.execute(query).df()
-    con.close()
-    return result_df
-
-def save_output_file(answer_text, fmt, work_dir, duckdb_query=None):
-    """
-    Save the answer_text or DuckDB query results in the specified format.
-    Returns a tuple: (output_path, base64_encoded_content)
-    """
-    output_path = os.path.join(work_dir, f"answer.{fmt}")
-
-    # Run DuckDB query if provided (assumes answer_text is CSV format string)
-    if duckdb_query:
-        try:
-            df = pd.read_csv(io.StringIO(answer_text))
-            df = run_duckdb_query(df, duckdb_query)
-            answer_text = df.to_string(index=False)
-        except Exception as e:
-            answer_text = f"Error running DuckDB query: {str(e)}"
-
-    if fmt == "txt":
-        with open(output_path, "w", encoding="utf-8") as f:
-            f.write(answer_text)
-
-    elif fmt == "docx":
-        doc = Document()
-        doc.add_paragraph(answer_text)
-        doc.save(output_path)
-
-    elif fmt == "pptx":
-        prs = Presentation()
-        slide = prs.slides.add_slide(prs.slide_layouts[1])
-        title = slide.shapes.title
-        title.text = "Analysis Results"
-        slide.shapes.add_textbox(Inches(1), Inches(2), Inches(6), Inches(4)).text = answer_text
-        prs.save(output_path)
-
-    elif fmt == "pdf":
-        c = canvas.Canvas(output_path)
-        # Basic line wrap for PDF output:
-        lines = answer_text.split('\n')
-        y = 750
-        for line in lines:
-            c.drawString(50, y, line)
-            y -= 15
-            if y < 50:
-                c.showPage()
-                y = 750
-        c.save()
-
-    elif fmt == "html":
-        with open(output_path, "w", encoding="utf-8") as f:
-            f.write(f"<html><body><pre>{answer_text}</pre></body></html>")
-
-    elif fmt == "xlsx":
-        df = pd.DataFrame({"Analysis": [answer_text]})
-        df.to_excel(output_path, index=False)
-
-    else:
-        raise ValueError(f"Unsupported format: {fmt}")
-
-    # Base64 encode the output file
-    with open(output_path, "rb") as f:
-        encoded = base64.b64encode(f.read()).decode("utf-8")
-
-    return output_path, encoded
+    result_df = con.ex_
