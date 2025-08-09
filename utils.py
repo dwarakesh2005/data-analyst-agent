@@ -8,12 +8,12 @@ from docx import Document
 from pptx import Presentation
 from pptx.util import Inches
 from reportlab.pdfgen import canvas
-import openai
+from openai import OpenAI
 
-# Hardcoded API credentials
-openai.api_key = "eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjIzZjIwMDE5MTVAZHMuc3R1ZHkuaWl0bS5hYy5pbiJ9.acO3-kXAgc-Q7TWfcThE2JLAsU81PDdvS6iIBfu7ELo"
-openai.api_base = "https://aiproxy.sanand.workers.dev/openai"
-
+# AI Pipe client
+client = OpenAI(
+    api_key="eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjIzZjIwMDE5MTVAZHMuc3R1ZHkuaWl0bS5hYy5pbiJ9.DqxIp0WMnSQCmn5L25fVVBpIFAUqocHHgwU8pwIZMh0",
+    base_url="https://aipipe.org/openai/v1"
 def read_questions(filepath):
     with open(filepath, "r") as f:
         return f.read()
@@ -53,11 +53,12 @@ def generate_answer(questions, context):
     Data:
     {context}
     """
-    response = openai.ChatCompletion.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0
-    )
+    response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "user", "content": prompt}],
+    temperature=0
+)
+return response.choices[0].message.content
     return response.choices[0].message.content
 
 def save_output_file(answer_text, fmt, work_dir):
