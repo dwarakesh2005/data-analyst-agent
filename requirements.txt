@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+python-multipart
+pandas
+requests
+beautifulsoup4
+PyPDF2
+python-docx
+python-pptx
+reportlab
+openpyxl
