@@ -13,7 +13,9 @@ from utils import (
 )
 
 app = FastAPI()
-
+@app.get("/")
+async def home():
+    return {"message": "Data Analyst Agent is running. Use POST / to send files."}
 @app.post("/")
 async def analyze(
     files: List[UploadFile] = File(...),
