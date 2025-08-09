@@ -14,9 +14,9 @@ import duckdb
 import io
 
 # Read AI Pipe token from environment variable
-AIPIPE_TOKEN = os.getenv("AIPIPE_TOKEN")
+AIPIPE_TOKEN = os.getenv("AI_PIPE_API_KEY")
 if not AIPIPE_TOKEN:
-    raise ValueError("Environment variable AIPIPE_TOKEN is not set")
+    raise ValueError("Environment variable AI_PIPE_API_KEY is not set")
 
 # AI Pipe client
 client = OpenAI(
